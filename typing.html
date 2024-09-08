@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Typing Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .game-wrapper {
+            display: flex;
+            gap: 20px;
+        }
+        #game-container {
+            text-align: center;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        #word-display {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        #input-field {
+            font-size: 18px;
+            padding: 5px;
+            width: 300px;
+            margin-bottom: 10px;
+        }
+        #score, #time, #wpm {
+            font-size: 18px;
+            margin-top: 10px;
+        }
+        .button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #history {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            max-height: 400px;
+            overflow-y: auto;
+            width: 200px;
+        }
+        #history h3 {
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+        #history ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        #time-options {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-wrapper">
+        <div id="game-container">
+            <h1>Typing Game</h1>
+            <div id="word-display"></div>
+            <input type="text" id="input-field" autocomplete="off">
+            <div id="score">Score: 0</div>
+            <div id="time">Time: 60</div>
+            <div id="wpm">WPM: 0</div>
+            <div id="time-options">
+                <button class="button time-button" data-time="60">60s</button>
+                <button class="button time-button" data-time="30">30s</button>
+                <button class="button time-button" data-time="10">10s</button>
+            </div>
+            <button id="start-button" class="button">Start Game</button>
+        </div>
+        <div id="history">
+            <h3>High Scores</h3>
+            <ul id="high-scores"></ul>
+        </div>
+    </div>
+    <button id="back-button" class="button" onclick="window.location.href='index.html'">Back to Home</button>
+
+    <script>
+        const words = ['javascript', 'html', 'css', 'python', 'ruby', 'java', 'csharp', 'php', 'swift', 'kotlin'];
+        let currentWord = '';
+        let score = 0;
+        let timeLeft = 60;
+        let timer;
+        let highScores = JSON.parse(localStorage.getItem('typingHighScores')) || {};
+        let startTime;
+        let totalCharacters = 0;
+
+        const wordDisplay = document.getElementById('word-display');
+        const inputField = document.getElementById('input-field');
+        const scoreDisplay = document.getElementById('score');
+        const timeDisplay = document.getElementById('time');
+        const wpmDisplay = document.getElementById('wpm');
+        const startButton = document.getElementById('start-button');
+        const highScoresList = document.getElementById('high-scores');
+        const timeButtons = document.querySelectorAll('.time-button');
+
+        function getRandomWord() {
+            return words[Math.floor(Math.random() * words.length)];
+        }
+
+        function updateGame() {
+            currentWord = getRandomWord();
+            wordDisplay.textContent = currentWord;
+            inputField.value = '';
+            score++;
+            totalCharacters += currentWord.length;
+            scoreDisplay.textContent = `Score: ${score}`;
+            updateWPM();
+        }
+
+        function updateWPM() {
+            const elapsedMinutes = (Date.now() - startTime) / 60000;
+            const wpm = Math.round((totalCharacters / 5) / elapsedMinutes);
+            wpmDisplay.textContent = `WPM: ${wpm}`;
+        }
+
+        function startGame() {
+            score = 0;
+            totalCharacters = 0;
+            startTime = Date.now();
+            updateGame();
+            inputField.disabled = false;
+            inputField.focus();
+            startButton.disabled = true;
+            timeButtons.forEach(btn => btn.disabled = true);
+
+            timer = setInterval(() => {
+                timeLeft--;
+                timeDisplay.textContent = `Time: ${timeLeft}`;
+                updateWPM();
+
+                if (timeLeft === 0) {
+                    endGame();
+                }
+            }, 1000);
+        }
+
+        function endGame() {
+            clearInterval(timer);
+            const finalWPM = parseInt(wpmDisplay.textContent.split(': ')[1]);
+            alert(`Game over! Your score: ${score}, WPM: ${finalWPM}`);
+            inputField.disabled = true;
+            startButton.disabled = false;
+            timeButtons.forEach(btn => btn.disabled = false);
+            updateHighScores(score, finalWPM);
+        }
+
+        function updateHighScores(newScore, wpm) {
+            const gameTime = timeLeft;
+            if (!highScores[gameTime]) {
+                highScores[gameTime] = [];
+            }
+            highScores[gameTime].push({score: newScore, wpm: wpm});
+            highScores[gameTime].sort((a, b) => b.score - a.score);
+            highScores[gameTime] = highScores[gameTime].slice(0, 5);
+            localStorage.setItem('typingHighScores', JSON.stringify(highScores));
+            displayHighScores();
+        }
+
+        function displayHighScores() {
+            highScoresList.innerHTML = '';
+            for (const time in highScores) {
+                const timeHeader = document.createElement('li');
+                timeHeader.textContent = `${time}s Game:`;
+                highScoresList.appendChild(timeHeader);
+
+                highScores[time].forEach(entry => {
+                    const li = document.createElement('li');
+                    li.textContent = `Score: ${entry.score}, WPM: ${entry.wpm}`;
+                    highScoresList.appendChild(li);
+                });
+            }
+        }
+
+        inputField.addEventListener('input', () => {
+            if (inputField.value === currentWord) {
+                updateGame();
+            }
+        });
+
+        startButton.addEventListener('click', startGame);
+
+        timeButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                timeLeft = parseInt(button.dataset.time);
+                timeDisplay.textContent = `Time: ${timeLeft}`;
+            });
+        });
+
+        displayHighScores();
+    </script>
+</body>
+</html>
+
+
+
+

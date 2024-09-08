@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guess the Number Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .game-container {
+            display: flex;
+            flex-direction: row;
+            gap: 20px;
+            max-width: 800px;
+            width: 100%;
+        }
+        .game-area {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            flex: 2;
+        }
+        .history-column {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            flex: 1;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        h1, h2 {
+            color: #333;
+            margin-top: 0;
+        }
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        #message {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+        #guessCount {
+            margin-top: 10px;
+        }
+        @media (max-width: 768px) {
+            .game-container {
+                flex-direction: column;
+            }
+            .history-column {
+                max-height: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="game-area">
+            <h1>Guess the Number Game</h1>
+            <p>Guess a number between 1 and 100:</p>
+            <input type="number" id="guessInput" min="1" max="100">
+            <button onclick="checkGuess()">Submit Guess</button>
+            <button onclick="resetGame()">New Game</button>
+            <button onclick="window.location.href='index.html'">Back to Home</button>
+            <div id="message"></div>
+            <div id="guessCount"></div>
+        </div>
+        <div class="history-column">
+            <h2>Game History</h2>
+            <ul id="historyList"></ul>
+        </div>
+    </div>
+
+    <script>
+        let secretNumber = Math.floor(Math.random() * 100) + 1;
+        let guesses = 0;
+
+        function checkGuess() {
+            const guess = parseInt(document.getElementById('guessInput').value);
+            guesses++;
+
+            if (isNaN(guess) || guess < 1 || guess > 100) {
+                setMessage('Please enter a valid number between 1 and 100.');
+                return;
+            }
+
+            if (guess === secretNumber) {
+                setMessage(`Congratulations! You guessed the number in ${guesses} tries.`);
+                updateHistory(guesses);
+                document.getElementById('guessInput').disabled = true;
+            } else if (guess < secretNumber) {
+                setMessage('Too low. Try again!');
+            } else {
+                setMessage('Too high. Try again!');
+            }
+
+            document.getElementById('guessCount').textContent = `Guesses: ${guesses}`;
+        }
+
+        function setMessage(msg) {
+            document.getElementById('message').textContent = msg;
+        }
+
+        function resetGame() {
+            secretNumber = Math.floor(Math.random() * 100) + 1;
+            guesses = 0;
+            document.getElementById('guessInput').value = '';
+            document.getElementById('guessInput').disabled = false;
+            setMessage('');
+            document.getElementById('guessCount').textContent = '';
+        }
+
+        function updateHistory(score) {
+            const historyList = document.getElementById('historyList');
+            const listItem = document.createElement('li');
+            listItem.textContent = `Game completed in ${score} guesses`;
+            historyList.insertBefore(listItem, historyList.firstChild);
+
+            if (historyList.children.length > 5) {
+                historyList.removeChild(historyList.lastChild);
+            }
+        }
+    </script>
+</body>
+</html>

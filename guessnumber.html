@@ -6,73 +6,81 @@
     <title>Guess the Number Game</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f0f0f0;
+            font-family: 'Courier New', monospace;
+            background-color: #fff;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
+            color: #000;
+            transition: background-color 0.5s, color 0.5s;
         }
         .game-container {
             display: flex;
             flex-direction: row;
-            gap: 20px;
             max-width: 800px;
             width: 100%;
+            gap: 40px;
+            
         }
         .game-area {
             background-color: #fff;
-            border-radius: 8px;
             padding: 20px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             flex: 2;
         }
         .history-column {
             background-color: #fff;
-            border-radius: 8px;
             padding: 20px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             flex: 1;
             max-height: 400px;
             overflow-y: auto;
+            min-width: 200px;
         }
         h1, h2 {
             color: #333;
             margin-top: 0;
         }
+        .game-area, .history-column {
+            background-color: #fff;
+            border: 1px solid #000;
+            padding: 30px;
+            min-width: 200px;
+        }
         input[type="number"] {
-            width: 100%;
+            background-color: #fff;
+            color: #000;
+            border: 1px solid #000;
             padding: 10px;
-            margin: 10px 0;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+            margin: 20px 0;
         }
         button {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 4px;
-            cursor: pointer;
-            margin-right: 10px;
+            background-color: #fff;
+            color: #000;
+            border: 1px solid #000;
+            padding: 10px 20px;
+            margin-right: 20px;
+            transition: background-color 0.3s, color 0.3s;
+            font-family: 'Courier New', monospace;
         }
-        #message {
-            margin-top: 20px;
-            font-weight: bold;
+        button:hover {
+            background-color: #000;
+            color: #fff;
+            transform: scale(1.1);
         }
-        #guessCount {
-            margin-top: 10px;
+        /* ASCII art style border */
+        body::before, body::after {
+            content: "+------------------------------+";
+            position: fixed;
+            left: 10px;
+            right: 10px;
+            text-align: center;
+            color: #000;
         }
-        @media (max-width: 768px) {
-            .game-container {
-                flex-direction: column;
-            }
-            .history-column {
-                max-height: 200px;
-            }
-        }
+        body::before { top: 10px; }
+        body::after { bottom: 10px; }
     </style>
 </head>
 <body>
@@ -88,7 +96,7 @@
             <div id="guessCount"></div>
         </div>
         <div class="history-column">
-            <h2>Game History</h2>
+            <h2>History</h2>
             <ul id="historyList"></ul>
         </div>
     </div>

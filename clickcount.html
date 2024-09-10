@@ -6,26 +6,23 @@
     <title>Click Count Game</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Courier New', monospace;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: center;
             height: 100vh;
             margin: 0;
             background-color: #f0f0f0;
+            transition: background-color 0.5s, color 0.5s;
         }
         #game-container {
-            text-align: center;
-            background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            background-color: #fff;
+            border: 1px solid #333;
+            padding: 30px;
+            margin-bottom: 30px;
         }
         #click-area {
-            width: 300px;
             height: 300px;
-            background-color: #4CAF50;
+            background-color: #fff;
             color: white;
             font-size: 36px;
             font-weight: bold;
@@ -35,89 +32,81 @@
             cursor: pointer;
             margin: 20px auto;
             user-select: none;
-            border-radius: 50%;
-            box-shadow: 0 8px 0 #45a049, 0 15px 20px rgba(0,0,0,0.2);
+            box-shadow: 0 8px 0, 0 15px 20px rgba(0,0,0,0.2);
             transition: all 0.2s ease;
             position: relative;
             overflow: hidden;
         }
-        #click-area:before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            background: rgba(255,255,255,0.7);
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            transition: all 0.5s ease;
-        }
-        #click-area:active:before {
-            width: 400px;
-            height: 400px;
-            opacity: 0;
-        }
         #click-area:active {
             transform: scale(0.95) rotate(5deg);
-            box-shadow: 0 3px 0 #45a049, 0 5px 10px rgba(0,0,0,0.2);
+            box-shadow: 6px 6px 6px #45a049, 10px 5px 10px rgba(0,0,0,0.2);
         }
         #timer, #score {
             font-size: 24px;
             margin: 15px 0;
             font-weight: bold;
+        
+            background-color: #fff;
+            color: #000;
+            border: 1px solid #fff;
+            margin: 30px auto;
         }
         .button {
-            padding: 15px 30px;
-            font-size: 18px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-top: 15px;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            background-color: #fff;
+            font-family: 'Courier New', monospace;
+            padding: 10px 30px;
+            font-size: 15px;
+            color: #000;
+            border: 1px solid #000;
+            margin-top: 20px;
+            transition: background-color 0.3s, color 0.3s;
         }
         .button:hover {
-            background-color: #45a049;
-            transform: translateY(-3px);
+            background-color: #000;
+            color: #fff;
             box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+            transform: scale(1.05);
         }
         #history {
+            background-color: #000;
+            border: 1px solid #fff;
+            padding: 20px;
             margin-top: 30px;
-            width: 250px;
-            background-color: #f9f9f9;
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        #history h3 {
-            margin-bottom: 15px;
-            color: #333;
-        }
-        #history-list {
-            list-style-type: none;
-            padding: 0;
         }
         #history-list li {
-            background-color: #e9e9e9;
             margin-bottom: 8px;
             padding: 8px;
             border-radius: 4px;
             font-weight: bold;
+            transition: background-color 0.5s, color 0.5s;
+            background-color: #fff;
+            border: 1px solid #000;
+            margin-bottom: 10px;
+            padding: 10px;
         }
         @keyframes pulse {
             0% { transform: scale(1); }
             50% { transform: scale(1.05); }
             100% { transform: scale(1); }
         }
+        .pulse {
+            animation: pulse 0.5s;
+        }
         @keyframes colorChange {
             0% { background-color: #4CAF50; }
-            33% { background-color: #3F51B5; }
-            66% { background-color: #FF5722; }
-            100% { background-color: #4CAF50; }
+            50% { background-color: #333; }
+            100% { background-color: #4CAF50; } 
         }
+        body::before, body::after {
+            content: "+------------------------------+";
+            position: fixed;
+            left: 10px;
+            right: 10px;
+            text-align: center;
+            color: #fff;
+        }
+        body::before { top: 10px; }
+        body::after { bottom: 10px; }
     </style>
 </head>
 <body>
@@ -132,7 +121,7 @@
             <ul id="history-list"></ul>
         </div>
     </div>
-    <button id="back-button" class="button" onclick="window.location.href='index.html'">Back to Home</button>
+    <button id="back-button" class="button" onclick="reverseColors(); setTimeout(() => window.location.href='index.html', 500)">Back to Home</button>
 
     <script>
         const clickArea = document.getElementById('click-area');
@@ -200,9 +189,19 @@
         });
 
         startButton.addEventListener('click', startGame);
+
+        function reverseColors() {
+            document.body.style.backgroundColor = '#000';
+            document.body.style.color = '#fff';
+            document.getElementById('game-container').style.backgroundColor = '#000';
+            document.getElementById('game-container').style.color = '#fff';
+            document.getElementById('history').style.backgroundColor = '#333';
+            document.getElementById('history').style.color = '#fff';
+            document.querySelectorAll('#history-list li').forEach(li => {
+                li.style.backgroundColor = '#555';
+                li.style.color = '#fff';
+            });
+        }
     </script>
 </body>
 </html>
-
-
-

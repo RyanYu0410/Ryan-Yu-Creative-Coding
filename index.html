@@ -6,14 +6,17 @@
     <title>Web Game Hub</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Courier New', monospace;
             margin: 0;
             padding: 20px;
-            background-color: #f0f0f0;
+            background-color: #000;
+            color: #fff;
+            transition: background-color 0.5s, color 0.5s;
         }
         h1 {
             text-align: center;
             color: #333;
+            margin-bottom: 30px;
         }
         .game-grid {
             display: grid;
@@ -22,27 +25,74 @@
             padding: 20px;
         }
         .game-card {
-            background-color: #fff;
-            border-radius: 8px;
+            background-color: #000;
+            border: 1px solid #fff;
             padding: 15px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: box-shadow 0.3s;
+        }
+        .game-card:hover {
+            box-shadow: 0 0 0 2px #fff;
         }
         .game-card h2 {
             margin-top: 0;
+            margin-bottom: 15px;
         }
         .play-button {
             display: inline-block;
-            background-color: #4CAF50;
-            color: white;
+            background-color: #000;
+            color: #fff;
             padding: 10px 15px;
             text-decoration: none;
-            border-radius: 5px;
-            margin-top: 10px;
+            border: 1px solid #fff;
+            margin-top: 15px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .play-button:hover {
+            background-color: #fff;
+            color: #000;
+        }
+        .corner-emoji {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            font-size: 24px;
+            text-decoration: none;
+            cursor: pointer;
+            border: 1px solid #fff;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.3s ease;
+        }
+        .corner-emoji:hover {
+            transform: scale(1.1);
+        }
+        /* ASCII art style border */
+        body::before {
+            content: "+------------------------------+";
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            text-align: center;
+            color: #fff;
+        }
+        body::after {
+            content: "+------------------------------+";
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+            right: 10px;
+            text-align: center;
+            color: #fff;
         }
     </style>
 </head>
 <body>
     <h1>Web Game Hub</h1>
+    <a href="chat.html" class="corner-emoji" title="Chat">&#x2315;</a>
     <div class="game-grid" id="gameGrid"></div>
 
     <script>
@@ -53,9 +103,7 @@
             { name: "Click Count", description: "How many times can you click in 10 seconds?", file: "clickcount.html" },
             { name: "Guess the Number", description: "Guess the secret number between 1 and 100!", file: "guessnumber.html" },
             { name: "Rock Paper Scissors", description: "Play the classic game against the computer!", file: "rockpaperscissors.html" },
-            { name: "Color Match", description: "Match the color name with the displayed color!", file: "colormatch.html" },
-            { name: "Math Quiz", description: "Test your basic math skills with quick questions!", file: "mathquiz.html" }
-        ];
+            ];
 
         const gameGrid = document.getElementById('gameGrid');
 
@@ -69,11 +117,27 @@
             `;
             gameGrid.appendChild(gameCard);
         });
+
+        // Function to reverse colors
+        function reverseColors() {
+            document.body.style.backgroundColor = '#fff';
+            document.body.style.color = '#000';
+            document.querySelectorAll('.game-card').forEach(card => {
+                card.style.backgroundColor = '#fff';
+                card.style.color = '#000';
+                card.style.borderColor = '#000';
+            });
+            document.querySelectorAll('.play-button').forEach(button => {
+                button.style.backgroundColor = '#fff';
+                button.style.color = '#000';
+                button.style.borderColor = '#000';
+            });
+            document.querySelector('.corner-emoji').style.borderColor = '#000';
+            document.body.style.setProperty('--before-after-color', '#000');
+        }
+
+        // Call reverseColors when the page loads
+        window.onload = reverseColors;
     </script>
 </body>
 </html>
-
-
-
-
-

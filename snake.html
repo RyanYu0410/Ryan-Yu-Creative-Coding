@@ -6,6 +6,7 @@
     <title>Snake Game</title>
     <style>
         body {
+            font-family: 'Courier New', monospace;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -14,36 +15,49 @@
             margin: 0;
             background-color: #f0f0f0;
             font-family: Arial, sans-serif;
+            transition: background-color 0.5s, color 0.5s;
         }
         #gameCanvas {
-            border: 2px solid #333;
-            margin-bottom: 20px;
+            border: 1px solid #333;
+            margin-bottom: 30px;
+            font-family: 'Courier New', monospace;
         }
         #backButton {
+            font-family: 'Courier New', monospace;
+            background-color: #000;
+            color: #fff;
+            border: 1px solid #fff;
             padding: 10px 20px;
-            font-size: 16px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        #backButton:hover {
+            background-color: #fff;
+            color: #000;
         }
         #scoreBoard {
-            width: 400px;
-            background-color: white;
-            border: 2px solid #333;
-            padding: 10px;
-            margin-top: 20px;
+            background-color: #fff;
+            border: 1px solid #333;
+            padding: 20px;
+            font-family: 'Courier New', monospace;
+            margin-top: 30px;
         }
-        #scoreBoard h2 {
-            margin-top: 0;
+        /* ASCII art style border */
+        body::before, body::after {
+            content: "+------------------------------+";
+            position: fixed;
+            left: 10px;
+            right: 10px;
+            text-align: center;
+            color: #333;
         }
+        body::before { top: 10px; }
+        body::after { bottom: 10px; }
     </style>
 </head>
 <body>
     <canvas id="gameCanvas" width="400" height="400"></canvas>
-    <button id="backButton" onclick="window.location.href='index.html'">Back to Home</button>
+    <button id="backButton" onclick="reverseColors(); reverseSnakeAndFood(); setTimeout(() => window.location.href='index.html', 500)">Back to Home</button>
     <div id="scoreBoard">
         <h2>High Scores</h2>
         <ol id="highScores"></ol>
@@ -64,6 +78,8 @@
         let dy = 0;
         let score = 0;
         let highScores = JSON.parse(localStorage.getItem('snakeHighScores')) || [];
+        let snakeColor = 'green';
+        let foodColor = 'red';
 
         function drawGame() {
             clearCanvas();
@@ -75,7 +91,8 @@
         }
 
         function clearCanvas() {
-            ctx.fillStyle = 'white';
+            const backgroundColor = document.body.style.backgroundColor === 'rgb(0, 0, 0)' ? 'black' : 'white';
+            ctx.fillStyle = backgroundColor;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
         }
 
@@ -91,14 +108,14 @@
         }
 
         function drawSnake() {
-            ctx.fillStyle = 'green';
+            ctx.fillStyle = snakeColor;
             snake.forEach(segment => {
                 ctx.fillRect(segment.x * gridSize, segment.y * gridSize, gridSize - 2, gridSize - 2);
             });
         }
 
         function drawFood() {
-            ctx.fillStyle = 'red';
+            ctx.fillStyle = foodColor;
             ctx.fillRect(food.x * gridSize, food.y * gridSize, gridSize - 2, gridSize - 2);
         }
 
@@ -188,10 +205,24 @@
             setTimeout(gameLoop, 100);
         }
 
+        function reverseColors() {
+            document.body.style.backgroundColor = '#000';
+            document.body.style.color = '#fff';
+            document.getElementById('backButton').style.backgroundColor = '#000';
+            document.getElementById('backButton').style.color = '#fff';
+            document.getElementById('scoreBoard').style.backgroundColor = '#000';
+            document.getElementById('scoreBoard').style.color = '#fff';
+        }
+
+        function reverseSnakeAndFood() {
+            snakeColor = snakeColor === 'green' ? 'white' : 'green';
+            foodColor = foodColor === 'red' ? 'yellow' : 'red';
+            drawGame();
+        }
+
         generateFood();
         displayHighScores();
         gameLoop();
     </script>
 </body>
 </html>
-

@@ -6,13 +6,24 @@
     <title>Memory Match Game</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Courier New', monospace;
+            background-color: #fff;
+            color: #000;
             margin: 0;
             padding: 20px;
             background-color: #f0f0f0;
             display: flex;
             flex-direction: column;
             align-items: center;
+            transition: background-color 0.5s, color 0.5s;
+        }
+        h1 {
+            font-family: 'Courier New', monospace;
+            font-size: 24px;
+            font-weight: lighter;
+            text-align: center;
+            margin-bottom: 40px;
+            color: #000;
         }
         .game-container {
             display: flex;
@@ -25,10 +36,9 @@
         .game-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            margin-bottom: 20px;
+            gap: 20px;
         }
-        .card {
+        .card {            
             width: 100%;
             aspect-ratio: 1 / 1;
             background-color: #ddd;
@@ -37,17 +47,20 @@
             align-items: center;
             font-size: 24px;
             cursor: pointer;
-            transition: transform 0.3s;
+            background-color: #000;
+            border: 1px solid #fff;
+            color: #fff;
+            transition: transform 0.3s, background-color 0.5s, color 0.5s;
         }
         .card:hover {
             transform: scale(1.05);
         }
         .card.flipped {
-            background-color: #fff;
+            background-color: #fff;       
         }
         .game-info {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
         }
         .history-column {
             margin-left: 20px;
@@ -57,23 +70,23 @@
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
             max-height: 400px;
             overflow-y: auto;
+            transition: background-color 0.5s, color 0.5s;
         }
         .button-container {
             display: flex;
             justify-content: center;
             margin-top: 20px;
+            color: #000;
         }
         .button {
+            background-color: #000;
+            color: #fff;
+            border: 1px solid #fff;
             padding: 10px 20px;
-            font-size: 16px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            margin: 0 10px;
+            margin: 20px 10px;
+            transition: background-color 0.3s, color 0.3s;
         }
-        @keyframes pulse {
+         @keyframes pulse {
             0% { transform: scale(1); }
             50% { transform: scale(1.1); }
             100% { transform: scale(1); }
@@ -95,13 +108,27 @@
                 margin-left: 0;
                 margin-top: 20px;
             }
+        .button:hover {
+            background-color: #fff;
+            color: #000;
         }
-        @media (min-width: 769px) {
-            .game-grid {
-                width: 500px;
-                height: 500px;
-            }
+        .history-column {
+            background-color: #000;
+            border: 1px solid #fff;
+            padding: 20px;
         }
+        /* ASCII art style border */
+        body::before, body::after {
+            content: "+------------------------------+";
+            position: fixed;
+            left: 10px;
+            right: 10px;
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        body::before { top: 10px; }
+        body::after { bottom: 10px; }
     </style>
 </head>
 <body>
@@ -115,7 +142,7 @@
             </div>
             <div class="button-container">
                 <button class="button" id="startButton">Start Game</button>
-                <button class="button" onclick="window.location.href='index.html'">Back to Home</button>
+                <button class="button" id="backButton">Back to Home</button>
             </div>
         </div>
         <div class="history-column">
@@ -128,6 +155,7 @@
         const scoreElement = document.getElementById('score');
         const timeElement = document.getElementById('time');
         const startButton = document.getElementById('startButton');
+        const backButton = document.getElementById('backButton');
         const historyList = document.getElementById('historyList');
 
         let cards = [];
@@ -224,7 +252,27 @@
             }
         }
 
+        function reverseColors() {
+            document.body.style.backgroundColor = '#000';
+            document.body.style.color = '#fff';
+            document.querySelectorAll('.card').forEach(card => {
+                card.style.backgroundColor = '#333';
+                card.style.color = '#fff';
+            });
+            document.querySelector('.history-column').style.backgroundColor = '#333';
+            document.querySelector('.history-column').style.color = '#fff';
+            document.querySelectorAll('.button').forEach(button => {
+                button.style.backgroundColor = '#333';
+                button.style.color = '#fff';
+            });
+        }
+
         startButton.addEventListener('click', startGame);
+
+        backButton.addEventListener('click', function() {
+            reverseColors();
+            setTimeout(() => window.location.href = 'index.html', 500);
+        });
 
         // Initialize the grid with cards
         shuffledEmojis.forEach(emoji => {
@@ -233,16 +281,3 @@
     </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-

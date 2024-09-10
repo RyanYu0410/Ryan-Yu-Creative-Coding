@@ -13,51 +13,65 @@
             align-items: center;
             height: 100vh;
             margin: 0;
-            background-color: #f0f0f0;
-            font-family: Arial, sans-serif;
+            background-color: #000;
+            color: #fff;
             transition: background-color 0.5s, color 0.5s;
         }
         #gameCanvas {
             border: 1px solid #333;
             margin-bottom: 30px;
             font-family: 'Courier New', monospace;
+            z-index: 10; /* Add this line to bring gameCanvas to the upper layer */
         }
         #backButton {
             font-family: 'Courier New', monospace;
             background-color: #000;
             color: #fff;
-            border: 1px solid #fff;
+            border: 1px solid #000;
             padding: 10px 20px;
             margin-bottom: 30px;
             transition: background-color 0.3s, color 0.3s;
         }
         #backButton:hover {
-            background-color: #fff;
-            color: #000;
+            background-color: #000;
+            color: #fff;
+            transform: scale(1.1);
+            transition: transform 0.3s;
         }
         #scoreBoard {
             background-color: #fff;
-            border: 1px solid #333;
+            border: 1px solid #fff;
             padding: 20px;
             font-family: 'Courier New', monospace;
             margin-top: 30px;
+            color: #fff;
         }
         /* ASCII art style border */
         body::before, body::after {
+            font-family: 'Courier New', monospace;
             content: "+------------------------------+";
             position: fixed;
             left: 10px;
             right: 10px;
             text-align: center;
-            color: #333;
+            color: #fff;
         }
         body::before { top: 10px; }
         body::after { bottom: 10px; }
+        #highScoreSnake {
+            position: absolute;
+            left:5%;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 200px;
+            height: 200px;
+        }
     </style>
 </head>
 <body>
     <canvas id="gameCanvas" width="400" height="400"></canvas>
-    <button id="backButton" onclick="reverseColors(); reverseSnakeAndFood(); setTimeout(() => window.location.href='index.html', 500)">Back to Home</button>
+    <canvas id="highScoreSnake" width="200" height="200"></canvas>
+    <button id="backButton" onclick="reverseColors(); reverseSnakeAndFoodOnUnload(); setTimeout(() => window.location.href='index.html', 500)">Back to Home</button>
     <div id="scoreBoard">
         <h2>High Scores</h2>
         <ol id="highScores"></ol>
@@ -66,6 +80,8 @@
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         const highScoresList = document.getElementById('highScores');
+        const highScoreSnakeCanvas = document.getElementById('highScoreSnake');
+        const highScoreSnakeCtx = highScoreSnakeCanvas.getContext('2d');
 
         const gridSize = 20;
         const tileCount = canvas.width / gridSize;
@@ -80,6 +96,7 @@
         let highScores = JSON.parse(localStorage.getItem('snakeHighScores')) || [];
         let snakeColor = 'green';
         let foodColor = 'red';
+        let highScoreSnakeAngle = 0;
 
         function drawGame() {
             clearCanvas();
@@ -91,7 +108,7 @@
         }
 
         function clearCanvas() {
-            const backgroundColor = document.body.style.backgroundColor === 'rgb(0, 0, 0)' ? 'black' : 'white';
+            const backgroundColor = document.body.style.backgroundColor === 'rgb(255, 255, 255)' ? 'white' : 'black';
             ctx.fillStyle = backgroundColor;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
         }
@@ -146,7 +163,7 @@
         }
 
         function drawScore() {
-            ctx.fillStyle = 'black';
+            ctx.fillStyle = document.body.style.backgroundColor === 'rgb(255, 255, 255)' ? 'black' : 'white';
             ctx.font = '20px Arial';
             ctx.fillText(`Score: ${score}`, 10, 30);
         }
@@ -166,6 +183,29 @@
                 li.textContent = score;
                 highScoresList.appendChild(li);
             });
+        }
+
+        function drawHighScoreSnake() {
+            const highestScore = highScores[0] || 0;
+            const snakeLength = Math.min(highestScore, 100);
+            let x = 100;
+            let y = 100;
+            const radius = 80;
+
+            highScoreSnakeCtx.clearRect(0, 0, 200, 200);
+            highScoreSnakeCtx.fillStyle = snakeColor;
+
+            for (let i = 0; i < snakeLength; i++) {
+                const segmentAngle = highScoreSnakeAngle + i * 0.1;
+                const segmentX = x + Math.cos(segmentAngle) * radius;
+                const segmentY = y + Math.sin(segmentAngle) * radius;
+                highScoreSnakeCtx.beginPath();
+                highScoreSnakeCtx.arc(segmentX, segmentY, 4, 0, Math.PI * 2);
+                highScoreSnakeCtx.fill();
+            }
+
+            highScoreSnakeAngle += 0.05;
+            requestAnimationFrame(drawHighScoreSnake);
         }
 
         document.addEventListener('keydown', changeDirection);
@@ -206,19 +246,37 @@
         }
 
         function reverseColors() {
-            document.body.style.backgroundColor = '#000';
-            document.body.style.color = '#fff';
-            document.getElementById('backButton').style.backgroundColor = '#000';
-            document.getElementById('backButton').style.color = '#fff';
-            document.getElementById('scoreBoard').style.backgroundColor = '#000';
-            document.getElementById('scoreBoard').style.color = '#fff';
+            const isDark = document.body.style.backgroundColor === 'rgb(255, 255, 255)';
+            document.body.style.backgroundColor = isDark ? '#000' : '#fff';
+            document.body.style.color = isDark ? '#fff' : '#000';
+            document.getElementById('backButton').style.backgroundColor = isDark ? '#000' : '#fff';
+            document.getElementById('backButton').style.color = isDark ? '#fff' : '#000';
+            document.getElementById('scoreBoard').style.color = isDark ? '#fff' : '#000';
+            document.body.style.setProperty('--before-after-color', isDark ? '#fff' : '#000');
+            document.getElementById('scoreBoard').style.backgroundColor = isDark ? '#000' : '#fff';
         }
 
-        function reverseSnakeAndFood() {
-            snakeColor = snakeColor === 'green' ? 'white' : 'green';
-            foodColor = foodColor === 'red' ? 'yellow' : 'red';
-            drawGame();
+        function reverseSnakeAndFoodOnUnload() {
+            snakeColor = snakeColor === 'white' ? 'green' : 'white';
+            foodColor = foodColor === 'yellow' ? 'red' : 'yellow';
+        }  
+        function reverseSnakeAndFoodOnLoad() {
+            snakeColor = snakeColor === 'white' ? 'white' : 'green';
+            foodColor = foodColor === 'yellow' ? 'yellow' : 'red';
         }
+
+        // Reverse colors when entering the page
+        window.onload = () => {
+            reverseColors();
+            reverseSnakeAndFoodOnLoad();
+            drawHighScoreSnake();
+        };
+
+        // Reverse colors when exiting the page
+        window.addEventListener('beforeunload', () => {
+            reverseColors();
+            reverseSnakeAndFoodOnUnload();
+        });
 
         generateFood();
         displayHighScores();

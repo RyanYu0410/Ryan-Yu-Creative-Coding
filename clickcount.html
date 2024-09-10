@@ -11,12 +11,15 @@
             flex-direction: column;
             height: 100vh;
             margin: 0;
-            background-color: #f0f0f0;
+            background-color: #000;
+            color: #fff;
             transition: background-color 0.5s, color 0.5s;
+            margin-bottom: 80px;
+            padding-bottom: 80px;
         }
         #game-container {
-            background-color: #fff;
-            border: 1px solid #333;
+            background-color: #000;
+            border: 1px solid #fff;
             padding: 30px;
             margin-bottom: 30px;
         }
@@ -32,70 +35,68 @@
             cursor: pointer;
             margin: 20px auto;
             user-select: none;
-            box-shadow: 0 8px 0, 0 15px 20px rgba(0,0,0,0.2);
+            box-shadow: 0 8px 0, 0 15px 20px rgba(255,255,255,0.2);
             transition: all 0.2s ease;
             position: relative;
             overflow: hidden;
         }
         #click-area:active {
-            transform: scale(0.95) rotate(5deg);
-            box-shadow: 6px 6px 6px #45a049, 10px 5px 10px rgba(0,0,0,0.2);
+            transform: rotate(5deg);
+            box-shadow: 6px 6px 6px #45a049, 10px 5px 10px rgba(255,255,255,0.2);
         }
         #timer, #score {
-            font-size: 24px;
+            font-size: 17px;
             margin: 15px 0;
-            font-weight: bold;
-        
-            background-color: #fff;
-            color: #000;
-            border: 1px solid #fff;
-            margin: 30px auto;
-        }
+            border-top: 1px solid #000;
+            border-bottom: 1px solid #fff;
+            padding-right: 20px;
+            padding-left: 10px;
+            padding-top: 10px;
+            display: inline-block;
+            margin-right: 30px;
+            }
         .button {
-            background-color: #fff;
+            background-color: #000;
             font-family: 'Courier New', monospace;
             padding: 10px 30px;
             font-size: 15px;
-            color: #000;
-            border: 1px solid #000;
+            color: #fff;
+            border: 1px solid #fff;
             margin-top: 20px;
-            transition: background-color 0.3s, color 0.3s;
+            transition: background-color 0.3s, color 0.3s, transform 0.3s;
         }
         .button:hover {
-            background-color: #000;
-            color: #fff;
-            box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+            background-color: #fff;
+            color: #000;
+            box-shadow: 0 6px 8px rgba(255,255,255,0.15);
             transform: scale(1.05);
         }
+        #back-button {
+            width: 50%;
+            margin-top: 20px;
+            margin-left: 25%;
+            margin-right: 25%;
+        }
         #history {
-            background-color: #000;
-            border: 1px solid #fff;
             padding: 20px;
+            padding-top: 0%;
             margin-top: 30px;
+            border-top: 1px solid #fff;
         }
         #history-list li {
             margin-bottom: 8px;
             padding: 8px;
-            border-radius: 4px;
             font-weight: bold;
             transition: background-color 0.5s, color 0.5s;
-            background-color: #fff;
-            border: 1px solid #000;
+            background-color: #000;
+            border-top: 1px solid #fff;
             margin-bottom: 10px;
             padding: 10px;
         }
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-        .pulse {
-            animation: pulse 0.5s;
-        }
         @keyframes colorChange {
-            0% { background-color: #4CAF50; }
-            50% { background-color: #333; }
-            100% { background-color: #4CAF50; } 
+            0% { background-color: #000; }
+            50% { background-color: #000; }
+            100% { background-color: #000; } 
         }
         body::before, body::after {
             content: "+------------------------------+";
@@ -104,7 +105,7 @@
             right: 10px;
             text-align: center;
             color: #fff;
-        }
+        } 
         body::before { top: 10px; }
         body::after { bottom: 10px; }
     </style>
@@ -114,7 +115,7 @@
         <h1>Click Count Game</h1>
         <div id="timer">Time: 10s</div>
         <div id="score">Score: 0</div>
-        <div id="click-area">CLICK ME!</div>
+        <div id="click-area"></div>
         <button id="start-button" class="button">Start Game</button>
         <div id="history">
             <h3>History</h3>
@@ -185,23 +186,44 @@
                 setTimeout(() => {
                     clickArea.style.transform = 'scale(1) rotate(0deg)';
                 }, 100);
+            } else {
+                startButton.style.backgroundColor = '#000';
+                startButton.style.color = '#fff';
+                setTimeout(() => {
+                    startButton.style.backgroundColor = '#fff';
+                    startButton.style.color = '#000';
+                }, 800);
             }
         });
 
         startButton.addEventListener('click', startGame);
 
         function reverseColors() {
-            document.body.style.backgroundColor = '#000';
-            document.body.style.color = '#fff';
-            document.getElementById('game-container').style.backgroundColor = '#000';
-            document.getElementById('game-container').style.color = '#fff';
-            document.getElementById('history').style.backgroundColor = '#333';
-            document.getElementById('history').style.color = '#fff';
+            document.body.style.backgroundColor = document.body.style.backgroundColor === 'rgb(0, 0, 0)' ? '#000' : '#fff';
+            document.body.style.color = document.body.style.color === 'rgb(255, 255, 255)' ? '#fff' : '#000';
+            document.getElementById('game-container').style.backgroundColor = document.getElementById('game-container').style.backgroundColor === 'rgb(255, 255, 255)' ? '#000' : '#fff';
+            document.getElementById('game-container').style.color = document.getElementById('game-container').style.color === 'rgb(0, 0, 0)' ? '#fff' : '#000';
+            document.getElementById('game-container').style.borderColor = document.getElementById('game-container').style.borderColor === 'rgb(0, 0, 0)' ? '#fff' : '#000';
+            document.getElementById('history').style.backgroundColor = document.getElementById('history').style.backgroundColor === 'rgb(255, 255, 255)' ? '#000' : '#fff';
+            document.getElementById('history').style.color = document.getElementById('history').style.color === 'rgb(0, 0, 0)' ? '#fff' : '#000';
+            document.getElementById('history').style.borderColor = document.getElementById('history').style.borderColor === 'rgb(0, 0, 0)' ? '#fff' : '#000';
             document.querySelectorAll('#history-list li').forEach(li => {
-                li.style.backgroundColor = '#555';
-                li.style.color = '#fff';
+                li.style.backgroundColor = li.style.backgroundColor === 'rgb(255, 255, 255)' ? '#000' : '#fff';
+                li.style.color = li.style.color === 'rgb(0, 0, 0)' ? '#fff' : '#000';
+                li.style.borderColor = li.style.borderColor === 'rgb(0, 0, 0)' ? '#fff' : '#000';
+            });
+            document.querySelectorAll('.button').forEach(button => {
+                button.style.backgroundColor = button.style.backgroundColor === 'rgb(255, 255, 255)' ? '#000' : '#fff';
+                button.style.color = button.style.color === 'rgb(0, 0, 0)' ? '#fff' : '#000';
+                button.style.borderColor = button.style.borderColor === 'rgb(0, 0, 0)' ? '#fff' : '#000';
+            });
+            document.querySelectorAll('body::before, body::after').forEach(el => {
+                el.style.color = el.style.color === 'rgb(0, 0, 0)' ? '#fff' : '#000';
             });
         }
+
+        // Reverse colors when the page loads
+        window.addEventListener('load', reverseColors);
     </script>
 </body>
 </html>

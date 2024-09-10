@@ -7,14 +7,16 @@
     <style>
         body {
             font-family: 'Courier New', monospace;
-            background-color: #fff;
+            background-color: #000;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            color: #000;
+            color: #fff;
             transition: background-color 0.5s, color 0.5s;
+            position: relative;
+            overflow: hidden;
         }
         .game-container {
             display: flex;
@@ -22,52 +24,48 @@
             max-width: 800px;
             width: 100%;
             gap: 40px;
-            
+        }
+        .game-area, .history-column {
+            background-color: #000;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(255,255,255,0.1);
+            border: 1px solid #fff;
+            min-width: 200px;
+            transition: background-color 0.5s, color 0.5s, border-color 0.5s;
         }
         .game-area {
-            background-color: #fff;
-            padding: 20px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             flex: 2;
         }
         .history-column {
-            background-color: #fff;
-            padding: 20px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             flex: 1;
             max-height: 400px;
             overflow-y: auto;
-            min-width: 200px;
         }
         h1, h2 {
-            color: #333;
+            color: #ccc;
             margin-top: 0;
-        }
-        .game-area, .history-column {
-            background-color: #fff;
-            border: 1px solid #000;
-            padding: 30px;
-            min-width: 200px;
+            transition: color 0.5s;
         }
         input[type="number"] {
-            background-color: #fff;
-            color: #000;
-            border: 1px solid #000;
+            background-color: #000;
+            color: #fff;
+            border: 1px solid #fff;
             padding: 10px;
             margin: 20px 0;
+            transition: background-color 0.5s, color 0.5s, border-color 0.5s;
         }
         button {
-            background-color: #fff;
-            color: #000;
-            border: 1px solid #000;
+            background-color: #000;
+            color: #fff;
+            border: 1px solid #fff;
             padding: 10px 20px;
             margin-right: 20px;
-            transition: background-color 0.3s, color 0.3s;
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
             font-family: 'Courier New', monospace;
         }
         button:hover {
-            background-color: #000;
-            color: #fff;
+            background-color: #fff;
+            color: #000;
             transform: scale(1.1);
         }
         /* ASCII art style border */
@@ -77,10 +75,41 @@
             left: 10px;
             right: 10px;
             text-align: center;
-            color: #000;
+            color: #fff;
+            transition: color 0.5s;
         }
         body::before { top: 10px; }
         body::after { bottom: 10px; }
+        
+        /* Media query for mobile devices */
+        @media (max-width: 768px) {
+            .game-container {
+                flex-direction: column;
+            }
+            .history-column {
+                margin-top: 20px;
+            }
+        }
+        #message {
+            padding-top: 20px;
+            transition: background-color 0.5s, color 0.5s;
+        }
+        @keyframes flowerAnimation {
+            0% { transform: scale(0); opacity: 0; }
+            50% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .flower {
+            display: inline-block;
+            animation: flowerAnimation 0.5s ease-out;
+        }
+        .background-flower {
+            position: absolute;
+            font-size: 24px;
+            opacity: 0;
+            z-index: -1;
+            animation: flowerAnimation 1s ease-out forwards;
+        }
     </style>
 </head>
 <body>
@@ -91,7 +120,7 @@
             <input type="number" id="guessInput" min="1" max="100">
             <button onclick="checkGuess()">Submit Guess</button>
             <button onclick="resetGame()">New Game</button>
-            <button onclick="window.location.href='index.html'">Back to Home</button>
+            <button onclick="exitGame()">Back to Home</button>
             <div id="message"></div>
             <div id="guessCount"></div>
         </div>
@@ -115,20 +144,33 @@
             }
 
             if (guess === secretNumber) {
-                setMessage(`Congratulations! You guessed the number in ${guesses} tries.`);
+                setMessage(`Congratulations! You guessed the number in ${guesses} tries. <span class="flower">🌹</span>`);
                 updateHistory(guesses);
                 document.getElementById('guessInput').disabled = true;
+                addBackgroundFlowers();
             } else if (guess < secretNumber) {
-                setMessage('Too low. Try again!');
+                setMessage('Too low. Try again!', true);
             } else {
-                setMessage('Too high. Try again!');
+                setMessage('Too high. Try again!', true);
             }
 
             document.getElementById('guessCount').textContent = `Guesses: ${guesses}`;
         }
 
-        function setMessage(msg) {
-            document.getElementById('message').textContent = msg;
+        function setMessage(msg, incorrect = false) {
+            const messageElement = document.getElementById('message');
+            messageElement.innerHTML = msg;
+            if (incorrect) {
+                messageElement.style.backgroundColor = '#000';
+                messageElement.style.color = '#fff';
+                setTimeout(() => {
+                    messageElement.style.backgroundColor = '#fff';
+                    messageElement.style.color = '#000';
+                }, 400);
+            } else {
+                messageElement.style.backgroundColor = '';
+                messageElement.style.color = '';
+            }
         }
 
         function resetGame() {
@@ -138,6 +180,7 @@
             document.getElementById('guessInput').disabled = false;
             setMessage('');
             document.getElementById('guessCount').textContent = '';
+            removeBackgroundFlowers();
         }
 
         function updateHistory(score) {
@@ -149,6 +192,51 @@
             if (historyList.children.length > 5) {
                 historyList.removeChild(historyList.lastChild);
             }
+        }
+
+        function reverseColors() {
+            document.body.style.backgroundColor = document.body.style.backgroundColor === 'rgb(255, 255, 255)' ? '#000' : '#fff';
+            document.body.style.color = document.body.style.color === 'rgb(0, 0, 0)' ? '#fff' : '#000';
+            document.querySelectorAll('.game-area, .history-column').forEach(el => {
+                el.style.backgroundColor = el.style.backgroundColor === 'rgb(255, 255, 255)' ? '#000' : '#fff';
+                el.style.borderColor = el.style.borderColor === 'rgb(0, 0, 0)' ? '#fff' : '#000';
+            });
+            document.querySelectorAll('h1, h2').forEach(el => {
+                el.style.color = el.style.color === 'rgb(51, 51, 51)' ? '#ccc' : '#333';
+            });
+            document.querySelectorAll('input, button').forEach(el => {
+                el.style.backgroundColor = el.style.backgroundColor === 'rgb(255, 255, 255)' ? '#000' : '#fff';
+                el.style.color = el.style.color === 'rgb(0, 0, 0)' ? '#fff' : '#000';
+                el.style.borderColor = el.style.borderColor === 'rgb(0, 0, 0)' ? '#fff' : '#000';
+            });
+            document.querySelectorAll('body::before, body::after').forEach(el => {
+                el.style.color = el.style.color === 'rgb(0, 0, 0)' ? '#fff' : '#000';
+            });
+        }
+
+        // Reverse colors when the page loads
+        window.addEventListener('load', reverseColors);
+
+        function exitGame() {
+            reverseColors();
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 500);
+        }
+
+        function addBackgroundFlowers() {
+            for (let i = 0; i < 20; i++) {
+                const flower = document.createElement('div');
+                flower.className = 'background-flower';
+                flower.textContent = '🌹';
+                flower.style.left = `${Math.random() * 100}%`;
+                flower.style.top = `${Math.random() * 100}%`;
+                document.body.appendChild(flower);
+            }
+        }
+
+        function removeBackgroundFlowers() {
+            document.querySelectorAll('.background-flower').forEach(flower => flower.remove());
         }
     </script>
 </body>

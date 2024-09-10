@@ -17,6 +17,7 @@
             text-align: center;
             color: #333;
             margin-bottom: 30px;
+            transition: color 0.5s;
         }
         .game-grid {
             display: grid;
@@ -28,14 +29,15 @@
             background-color: #000;
             border: 1px solid #fff;
             padding: 15px;
-            transition: box-shadow 0.3s;
+            transition: background-color 0.5s, color 0.5s, border-color 0.5s, box-shadow 0.3s;
         }
         .game-card:hover {
-            box-shadow: 0 0 0 2px #fff;
+            box-shadow: 0 0 0 2px #333;
         }
         .game-card h2 {
             margin-top: 0;
             margin-bottom: 15px;
+            transition: color 0.5s;
         }
         .play-button {
             display: inline-block;
@@ -45,11 +47,12 @@
             text-decoration: none;
             border: 1px solid #fff;
             margin-top: 15px;
-            transition: background-color 0.3s, color 0.3s;
+            transition: background-color 0.5s, color 0.5s, border-color 0.5s, box-shadow 0.3s;
         }
         .play-button:hover {
             background-color: #fff;
             color: #000;
+            box-shadow: 0 0 0 1px #333;
         }
         .corner-emoji {
             position: fixed;
@@ -64,29 +67,27 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            transition: transform 0.3s ease;
+            transition: transform 0.3s ease, border-color 0.5s;
         }
         .corner-emoji:hover {
             transform: scale(1.1);
         }
         /* ASCII art style border */
-        body::before {
-            content: "+------------------------------+";
+        body::before, body::after {
+            content: "+----------------------------+";
             position: fixed;
-            top: 10px;
             left: 10px;
             right: 10px;
             text-align: center;
-            color: #fff;
+            transition: color 0.5s;
+        }
+        body::before {
+            top: 10px;
+            color: #333;
         }
         body::after {
-            content: "+------------------------------+";
-            position: fixed;
             bottom: 10px;
-            left: 10px;
-            right: 10px;
-            text-align: center;
-            color: #fff;
+            color: #000;
         }
     </style>
 </head>
@@ -103,7 +104,7 @@
             { name: "Click Count", description: "How many times can you click in 10 seconds?", file: "clickcount.html" },
             { name: "Guess the Number", description: "Guess the secret number between 1 and 100!", file: "guessnumber.html" },
             { name: "Rock Paper Scissors", description: "Play the classic game against the computer!", file: "rockpaperscissors.html" },
-            ];
+        ];
 
         const gameGrid = document.getElementById('gameGrid');
 
@@ -119,25 +120,35 @@
         });
 
         // Function to reverse colors
-        function reverseColors() {
-            document.body.style.backgroundColor = '#fff';
-            document.body.style.color = '#000';
+        function reverseColors(isDark) {
+            document.body.style.backgroundColor = isDark ? '#000' : '#fff';
+            document.body.style.color = isDark ? '#fff' : '#000';
             document.querySelectorAll('.game-card').forEach(card => {
-                card.style.backgroundColor = '#fff';
-                card.style.color = '#000';
-                card.style.borderColor = '#000';
+                card.style.backgroundColor = isDark ? '#000' : '#fff';
+                card.style.color = isDark ? '#fff' : '#000';
+                card.style.borderColor = isDark ? '#fff' : '#000';
             });
             document.querySelectorAll('.play-button').forEach(button => {
-                button.style.backgroundColor = '#fff';
-                button.style.color = '#000';
-                button.style.borderColor = '#000';
+                button.style.backgroundColor = isDark ? '#000' : '#fff';
+                button.style.color = isDark ? '#fff' : '#000';
+                button.style.borderColor = isDark ? '#fff' : '#000';
             });
-            document.querySelector('.corner-emoji').style.borderColor = '#000';
-            document.body.style.setProperty('--before-after-color', '#000');
+            document.querySelector('.corner-emoji').style.borderColor = isDark ? '#fff' : '#000';
+            document.body.style.setProperty('--before-after-color', isDark ? '#fff' : '#000');
         }
 
         // Call reverseColors when the page loads
-        window.onload = reverseColors;
+        window.onload = () => reverseColors(false);
+        // Call reverseColors when the user clicks a link to leave the page
+        document.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', (event) => {
+                event.preventDefault();
+                reverseColors(true);
+                setTimeout(() => {
+                    window.location.href = link.href;
+                }, 500);
+            });
+        });
     </script>
 </body>
 </html>
